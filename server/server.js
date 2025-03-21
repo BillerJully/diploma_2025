@@ -7,7 +7,6 @@ const router = require('./router/index')
 const PORT = process.env.PORT || 4444
 const app = express()
 app.use(express.json())
-
 app.use('/api', router)
 
 

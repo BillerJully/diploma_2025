@@ -1,13 +1,13 @@
-const {categoryProfit} = require('../models/models')
+const {CategoryIncome} = require('../models/models')
 
 
-class CategoryIncome{
+class IncomeController{
 
     async create(req, res)//Создание категории
     {
         try {
             const {name} = req.body
-            const category = await categoryProfit.create({name})
+            const category = await CategoryIncome.create({name})
             res.json(category)
 
 
@@ -18,7 +18,7 @@ class CategoryIncome{
 
     async getAll(req, res)//Получение всех категорий 
     {
-        const categoryAll = await categoryProfit.findAll()
+        const categoryAll = await CategoryIncome.findAll()
         return res.json(categoryAll)
     }
 
@@ -26,7 +26,7 @@ class CategoryIncome{
     {
         try {
             const {id} = req.params
-            const categoryOne = await categoryProfit.findOne({where:{id}})
+            const categoryOne = await CategoryIncome.findOne({where:{id}})
             if(!categoryOne){
                 res.status(404).json({meassage:"Категория не найдена"})
             }
@@ -43,13 +43,13 @@ class CategoryIncome{
         try {
             const{name} = req.body
             const {id} = req.params
-            const category = await categoryProfit.findOne({where:{id}})
-            if(!category){
+            const categoryUp = await CategoryIncome.findOne({where:{id}})
+            if(!categoryUp){
                 res.status(404).json({meassage: "Категория не найдена"})
             }
-            category.name = name
-            await category.save()
-            return res.json(category)
+            categoryUp.name = name
+            await categoryUp.save()
+            return res.json(categoryUp)
             
         } catch (error) {
             console.error(error)
@@ -61,12 +61,12 @@ class CategoryIncome{
     {
         try {
             const {id} = req.params
-            const category = await categoryProfit.findOne({where:{id}})
+            const categoryDelete = await CategoryIncome.findOne({where:{id}})
             if(!category){
                 res.status(404).json({meassage:"Категория не найдена"})
             }
-            await category.destroy()
-            res.json(category)
+            await categoryDelete.destroy()
+            res.json(categoryDelete)
         }
             
         catch (error) {
@@ -77,4 +77,4 @@ class CategoryIncome{
 
 }
 
-module.exports = new CategoryIncome()
+module.exports = new IncomeController() //экспорт класса дохода

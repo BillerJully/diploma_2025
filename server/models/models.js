@@ -2,18 +2,20 @@ const {DataTypes} = require('sequelize')
 const sequelize = require('../db')
 
 
-const CategoryCost = sequelize.define('category_cost', {
-    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+const CategoryExpense = sequelize.define('category_expense', {
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true }, // Модель категории рассходов
     name: { type: DataTypes.STRING, unique: true,allowNull: false } 
 })
 
-const categoryProfit = sequelize.define('categoryProfit', {
-    id: {type: DataTypes.INTEGER, primaryKey:true, autoIncrement: true},
+const CategoryIncome = sequelize.define('category_income', {
+    id: {type: DataTypes.INTEGER, primaryKey:true, autoIncrement: true}, // Модель категории доходов
     name: {type: DataTypes.STRING, unique: true, allowNull: false}
 })
 
 module.exports ={
-    CategoryCost, 
-    categoryProfit, 
+    CategoryExpense, 
+    CategoryIncome, 
 
 }
+
+//стиль написания

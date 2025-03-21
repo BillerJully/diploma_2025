@@ -1,11 +1,11 @@
 const express = require('express')
 const router = express.Router()
 
-const categoryRouter = require('./expenditureRouter')
-const category_Income = require('./incomeRouter')
+const expenseRouter = require('./expenseRouter')
+const incomeRouter = require('./incomeRouter')
 
-router.use('/expenditure', categoryRouter)
-router.use('/income', category_Income)
+router.use('/expense', expenseRouter)
+router.use('/income', incomeRouter)
 
 
 module.exports = router
