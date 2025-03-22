@@ -64,7 +64,7 @@ class ExpenseController{
             const {id} = req.params
             const categoryDelete = await CategoryExpense.findOne({where: {id}})
 
-            if(!categoryCost){
+            if(!categoryDelete){
                 return res.status(404).json({message: "Категория не найдена"});    
             }
 
