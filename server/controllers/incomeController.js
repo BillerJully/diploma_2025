@@ -62,7 +62,7 @@ class IncomeController{
         try {
             const {id} = req.params
             const categoryDelete = await CategoryIncome.findOne({where:{id}})
-            if(!category){
+            if(!categoryDelete){
                 res.status(404).json({meassage:"Категория не найдена"})
             }
             await categoryDelete.destroy()
