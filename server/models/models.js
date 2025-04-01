@@ -1,6 +1,15 @@
-const {DataTypes} = require('sequelize')
+const {DataTypes, DatabaseError} = require('sequelize')
 const sequelize = require('../db')
 
+const Role = sequelize.define('role', {
+    id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
+    value: {type: DataTypes.STRING, unique: true, defaultValue:'USER'}
+})
+
+const User = sequelize.define('user', {
+    id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement:true},
+    username: { type: DataTypes.STRING, unique: true, allowNull: false, validate: { notEmpty: true }},
+    password: { type: DataTypes.STRING, allowNull: false, validate: { len: [6, 100] }} })
 
 const CategoryExpense = sequelize.define('category_expense', {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true }, // Модель категории рассходов
@@ -26,11 +35,14 @@ Transaction.belongsTo(CategoryExpense)
 CategoryIncome.hasMany(Transaction) 
 Transaction.belongsTo(CategoryIncome)
 
- 
+User.belongsToMany(Role, { through: 'user_roles' })
+Role.belongsToMany(User, { through: 'user_roles' })
+
 module.exports ={
     CategoryExpense, 
     CategoryIncome, 
     Transaction,
-
+    Role,
+    User,
 }
 
