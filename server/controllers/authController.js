@@ -33,14 +33,8 @@ class AuthContoller{
             const hashPassword = bcrypt.hashSync(password, 6)
             const userRole = await Role.findOne({where:{value:'USER'}})
 
-            // const [userRole, created] = await Role.findOrCreate({
-            //     where: { value: 'ADMIN'},S
-            //     defaults: { value: 'ADMIN' }
-            // })
-
             const newUser = await User.create({username, password: hashPassword, user_roles: [userRole.value]})
             await newUser.addRole(userRole)
-            //await newUser.save()
             return res.json({message:"Пользователь зарегистрован"})
 
         } 
@@ -74,21 +68,6 @@ class AuthContoller{
     }
 
 
-    async getUsers(req, res) {
-        try {
-            const users = await User.findAll()
-            res.json(users)
-            // const adminRole = new Role({value: "ADMIN"})
-            // const userRole = new Role()
-            // await adminRole.save()
-            // await userRole.save()
-
-        } 
-        catch (error) {
-            console.log("Возникла ошибка: ",error)
-            res.status(400).json({message:"Ошибка"})
-        }
-    }
 
     async deleteUser(req, res){
         try {
@@ -107,20 +86,6 @@ class AuthContoller{
         }
     }
 
-    async getOneUsers(req, res){
-        try {
-            const {id} = req.params
-            const userOne = await User.findOne({where:{id}})
-            if(!userOne){
-                return res.status(400).json({message:'Пользователь не существует'})
-            }
-            res.json({User: userOne})
-        } 
-        catch (error) {
-            console.log(error)
-            res.status(400).json({message:'Пользователь не найден'})
-        }
-    }
 }
 
 module.exports = new AuthContoller()
