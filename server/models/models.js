@@ -3,8 +3,8 @@ const CategoryExpense = require('./expenseModels')
 const CategoryIncome = require('./incomeModels')
 const Transaction = require('./transactionModels')
 
-User.hasMany(CategoryExpense)
-CategoryExpense.belongsTo(User)
+User.hasMany(CategoryExpense) // Один пользователь имеет много категорий
+CategoryExpense.belongsTo(User) // Одна категория имеет одного пользователя
 
 User.hasMany(CategoryIncome)
 CategoryIncome.belongsTo(User)

@@ -10,10 +10,11 @@ const generateAccessToken = (id) => {
     const payload = { 
         id
     }
-    return jwt.sign(payload, SECRET_KEY, { expiresIn: "24h" })
+    return jwt.sign(payload, SECRET_KEY, { expiresIn: "1h" })
 }
 
 class AuthController { 
+    
     async registration(req, res) {
         try {
             const errors = validationResult(req)
