@@ -1,91 +1,133 @@
-const {User, Role} = require('../models/models')
+const { User } = require('../models/models')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
-const {validationResult} = require('express-validator')
+const { validationResult } = require('express-validator')
 require('dotenv').config()
-secret = process.env.SECRET_KEY
 
-const generateAccessToken = (id, user_roles) => {
-    const playoad = {
-        id, 
-        user_roles
+const SECRET_KEY = process.env.SECRET_KEY 
+
+const generateAccessToken = (id) => {
+    const payload = { 
+        id
     }
-    return jwt.sign(playoad, secret, {expiresIn: "24h"})
+    return jwt.sign(payload, SECRET_KEY, { expiresIn: "24h" })
 }
 
-class AuthContoller{
-
+class AuthController { 
     async registration(req, res) {
         try {
-
             const errors = validationResult(req)
-            if(!errors.isEmpty()){
-                return res.status(400).json({message:"Ошибка при регистрации: ", errors})
+            if (!errors.isEmpty()) {
+                return res.status(400).json({
+                    message: "Ошибка валидации",
+                    errors: errors.array()
+                })
             }
 
-            const{username, password} = req.body
-            const user = await User.findOne({where:{username}})
+            const { username, password } = req.body
 
-            if(user){
-                return res.status(400).json({message: "Пользователь уже зарегистрован"})
+            // Проверка на существование пользователя
+            const candidate = await User.findOne({ where: { username } })
+            if (candidate) {
+                return res.status(400).json({ 
+                    message: "Пользователь с таким именем уже существует" 
+                })
             }
- 
-            const hashPassword = bcrypt.hashSync(password, 6)
-            const userRole = await Role.findOne({where:{value:'USER'}})
 
-            const newUser = await User.create({username, password: hashPassword, user_roles: [userRole.value]})
-            await newUser.addRole(userRole)
-            return res.json({message:"Пользователь зарегистрован"})
+            // Хеширование пароля
+            const hashPassword = await bcrypt.hash(password, 10) 
 
-        } 
-        catch (error) {
-            console.log("Возникла ошибка: ",error)
-            res.status(401).json({message:"Ошибка, зарегистровать пользователя не удалось "})
+            // Создание пользователя
+            const user = await User.create({ 
+                username, 
+                password: hashPassword 
+            })
+
+            // Генерация токена
+            const token = generateAccessToken(user.id)
+
+            return res.status(201).json({ // 201 для успешного создания
+                message: "Пользователь успешно зарегистрирован",
+                token,
+                userId: user.id
+            })
+
+        } catch (error) {
+            console.error("Ошибка регистрации:", error)
+            return res.status(500).json({ 
+                message: "Внутренняя ошибка сервера",
+                error: error.message 
+            })
         }
     }
-
 
     async login(req, res) {
         try {
-            const {username, password} = req.body
-            const user = await User.findOne({where:{username}})
+            const { username, password } = req.body
 
-            if(!user){
-                return res.status(401).json({message:"Ошибка, пользователь не зарегистрован"})
+            // Поиск пользователя
+            const user = await User.findOne({ where: { username } })
+            if (!user) {
+                return res.status(401).json({ 
+                    message: "Неверное имя пользователя или пароль" 
+                })
             }
 
-            const validPassword = bcrypt.compareSync(password, user.password)
-            if(!validPassword){
-                return res.status(400).json({message:"Введен неправильный пароль"})
+            // Проверка пароля
+            const validPassword = await bcrypt.compare(password, user.password)
+            if (!validPassword) {
+                return res.status(401).json({ 
+                    message: "Неверное имя пользователя или пароль"
+                })
             }
-            const token = generateAccessToken(user.id, user.user_roles)
-            return res.json({token:token})
-        } 
-        catch (error) {
-            console.log("Возникла ошибка: ",error)
-            res.status(400).json({message:"Ошибка"})
+
+            // Генерация токена
+            const token = generateAccessToken(user.id)
+
+            return res.json({
+                message: "Успешная авторизация",
+                token,
+                userId: user.id,
+                username: user.username
+            })
+
+        } catch (error) {
+            console.error("Ошибка авторизации:", error)
+            return res.status(500).json({ 
+                message: "Внутренняя ошибка сервера",
+                error: error.message 
+            })
         }
     }
 
-
-
-    async deleteUser(req, res){
+    async deleteUser(req, res) {
         try {
-            const {id} = req.params
-            const userDelet = await User.findOne({where:{id}})
-            if(!userDelet){
-                return res.status(400).json({message:'Пользователь не существует'})
+            const { id } = req.params
+
+            // Проверка, что пользователь существует
+            const user = await User.findByPk(id)
+            if (!user) {
+                return res.status(404).json({ 
+                    message: 'Пользователь не найден' 
+                })
             }
-            await userDelet.destroy()
-        res.json({message:'Пользователь удален',
-            user: userDelet})
-        } 
-        catch (error) {
-            console.log(error)
-            res.status(400).json({message:'Пользователь не может быть удален'})
+
+            // Удаление пользователя
+            await user.destroy()
+
+            return res.json({ 
+                message: 'Пользователь успешно удален',
+                deletedUserId: id
+            })
+
+        } catch (error) {
+            console.error("Ошибка удаления пользователя:", error)
+            return res.status(500).json({ 
+                message: "Не удалось удалить пользователя",
+                error: error.message 
+            })
         }
     }
-
 }
 
-module.exports = new AuthContoller()
+module.exports = new AuthController()

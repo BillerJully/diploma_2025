@@ -1,44 +1,26 @@
-const {DataTypes, DatabaseError} = require('sequelize')
-const sequelize = require('../db')
+const User = require('./userModels')
+const CategoryExpense = require('./expenseModels')
+const CategoryIncome = require('./incomeModels')
+const Transaction = require('./transactionModels')
 
+User.hasMany(CategoryExpense)
+CategoryExpense.belongsTo(User)
 
+User.hasMany(CategoryIncome)
+CategoryIncome.belongsTo(User)
 
-const User = sequelize.define('user', {
-    id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement:true},
-    username: { type: DataTypes.STRING, unique: true, allowNull: false, validate: { notEmpty: true }},
-    password: { type: DataTypes.STRING, allowNull: false, validate: { len: [6, 100] }} })
+User.hasMany(Transaction)
+Transaction.belongsTo(User)
 
-const CategoryExpense = sequelize.define('category_expense', {
-    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true }, // Модель категории рассходов
-    name: { type: DataTypes.STRING, unique: true,allowNull: false } 
-}) 
-
-const CategoryIncome = sequelize.define('category_income', {
-    id: {type: DataTypes.INTEGER, primaryKey:true, autoIncrement: true}, // Модель категории доходов
-    name: {type: DataTypes.STRING, unique: true, allowNull: false}
-})
-
-
-const Transaction = sequelize.define('transaction', {
-    id: {type: DataTypes.INTEGER, primaryKey:true, autoIncrement:true},
-    date_transaction: {type: DataTypes.STRING, allowNull: false},
-    name: {type: DataTypes.STRING,  allowNull: false},
-    sum: {type: DataTypes.INTEGER, allowNull: false},
-    categoryExpenseId: { type: DataTypes.INTEGER, allowNull: true }, 
-    categoryIncomeId: { type: DataTypes.INTEGER, allowNull: true }   
-})
 CategoryExpense.hasMany(Transaction)
 Transaction.belongsTo(CategoryExpense)
 
 CategoryIncome.hasMany(Transaction) 
 Transaction.belongsTo(CategoryIncome)
 
-
-
-module.exports ={
+module.exports = {
     CategoryExpense, 
     CategoryIncome, 
     Transaction,
     User,
 }
-
