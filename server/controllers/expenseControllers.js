@@ -1,83 +1,141 @@
-const {CategoryExpense} = require('../models/models')
+const { CategoryExpense } = require('../models/models')
 
-class ExpenseController{
-
-    async create(req, res)//Создание категории
-    {
-        const {name} = req.body
-        const category = await CategoryExpense.create({name})
-        res.json(category)
-    }
-
-    async getAll(req, res)//Получение всех категорий
-    {
-        const categoryAll = await CategoryExpense.findAll()
-        return res.json(categoryAll)
-    }
-
-    async getOne(req, res)//Получение одной категории по ID
-    {
+class ExpenseController {
+    async create(req, res) {
         try {
-            const {id} = req.params
-            const categoryOne = await CategoryExpense.findOne({where:{id}})
-            if(!categoryOne){
-                return res.status(404).json({message: `Категория с данным:${id} не существует`})
+            const { name } = req.body
+            const userId = req.user.id 
+
+            if (!name) {
+                return res.status(400).json({ message: "Название категории обязательно" })
             }
-            return res.json({
-                message: "Категория найдена",
-                category: categoryOne,
+
+            const category = await CategoryExpense.create({ name, userId })
+            return res.status(201).json({
+                message: "Категория расходов создана",
+                category
             })
-            
+
         } catch (error) {
-            console.error(error)
-            return res.status(500).json({message: "Запрос не может быть обработан"})
+            console.error('Ошибка при создании категории:', error)
+            return res.status(500).json({ 
+                message: "Ошибка при создании категории расходов",
+                error: error.message 
+            })
         }
     }
 
+    async getAll(req, res) {
+        try {
+            const userId = req.user.id
+            const categories = await CategoryExpense.findAll({ 
+                where: { userId },
+                attributes: ['id', 'name'] 
+            })
+            
+            return res.json({
+                count: categories.length,
+                categories
+            })
+        } catch (error) {
+            console.error('Ошибка при получении категорий:', error)
+            return res.status(500).json({ 
+                message: "Ошибка при получении категорий расходов",
+                error: error.message
+            })
+        }
+    }
 
-    async upDate(req,res)//Обновления названия в категории
-    {
+    async getOne(req, res) {
+        try {
+            const { id } = req.params
+            const userId = req.user.id
+
+            const category = await CategoryExpense.findOne({ 
+                where: { id, userId },
+                attributes: ['id', 'name']
+            })
+
+            if (!category) {
+                return res.status(404).json({ 
+                    message: `Категория расходов с ID ${id} не найдена`
+                })
+            }
+
+            return res.json(category)
+        } catch (error) {
+            console.error('Ошибка при получении категории:', error)
+            return res.status(500).json({ 
+                message: "Ошибка при получении категории расходов",
+                error: error.message
+            })
+        }
+    }
+
+    async update(req, res) {
         try {
             const { id } = req.params
             const { name } = req.body
-    
-            const categoryUP = await CategoryExpense.findOne({where: {id}})
-            if(!categoryUP){
-                return res.status(404).json({message:'Категория не найдена'})
+            const userId = req.user.id
+
+            if (!name) {
+                return res.status(400).json({ message: "Название категории обязательно" })
             }
-    
-            categoryUP.name = name
-            await categoryUP.save()
-            res.json(categoryUP)
-            
-            
+
+            const category = await CategoryExpense.findOne({ 
+                where: { id, userId }
+            })
+
+            if (!category) {
+                return res.status(404).json({ 
+                    message: `Категория расходов с ID ${id} не найдена`
+                })
+            }
+
+            category.name = name
+            await category.save()
+
+            return res.json({
+                message: "Категория расходов обновлена",
+                category
+            })
         } catch (error) {
-            console.error(error)
-            return res.status(500).json({message:'Ошибка при изменении категории'})
+            console.error('Ошибка при обновлении категории:', error)
+            return res.status(500).json({ 
+                message: "Ошибка при обновлении категории расходов",
+                error: error.message
+            })
         }
     }
 
-    async deleteOne(req, res)//Удаление категории по ID
-    {
-
+    async delete(req, res) {
         try {
-            const {id} = req.params
-            const categoryDelete = await CategoryExpense.findOne({where: {id}})
+            const { id } = req.params
+            const userId = req.user.id
 
-            if(!categoryDelete){
-                return res.status(404).json({message: "Категория не найдена"});    
+            const category = await CategoryExpense.findOne({ 
+                where: { id, userId }
+            })
+
+            if (!category) {
+                return res.status(404).json({ 
+                    message: `Категория расходов с ID ${id} не найдена`
+                })
             }
 
-            await categoryDelete.destroy()
-            return res.status(200).json({message:"Категория успешно удалена"})
-            
+            await category.destroy()
+            return res.json({ 
+                message: "Категория расходов успешно удалена",
+                deletedId: id
+            })
         } catch (error) {
-            console.error(error)
-            res.status(500).json({message: 'Ошибка при удалении'})
+            console.error('Ошибка при удалении категории:', error)
+            return res.status(500).json({ 
+                message: "Ошибка при удалении категории расходов",
+                error: error.message
+            })
         }
-    
-
     }
 }
 
-module.exports = new ExpenseController() //экспорт класса расхода
+module.exports = new ExpenseController()

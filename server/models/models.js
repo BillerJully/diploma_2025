@@ -1,36 +1,26 @@
-const {DataTypes} = require('sequelize')
-const sequelize = require('../db')
+const User = require('./userModels')
+const CategoryExpense = require('./expenseModels')
+const CategoryIncome = require('./incomeModels')
+const Transaction = require('./transactionModels')
 
+User.hasMany(CategoryExpense)
+CategoryExpense.belongsTo(User)
 
-const CategoryExpense = sequelize.define('category_expense', {
-    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true }, // Модель категории рассходов
-    name: { type: DataTypes.STRING, unique: true,allowNull: false } 
-}) 
+User.hasMany(CategoryIncome)
+CategoryIncome.belongsTo(User)
 
-const CategoryIncome = sequelize.define('category_income', {
-    id: {type: DataTypes.INTEGER, primaryKey:true, autoIncrement: true}, // Модель категории доходов
-    name: {type: DataTypes.STRING, unique: true, allowNull: false}
-})
+User.hasMany(Transaction)
+Transaction.belongsTo(User)
 
-const Transaction = sequelize.define('transaction', {
-    id: {type: DataTypes.INTEGER, primaryKey:true, autoIncrement:true},
-    date_transaction: {type: DataTypes.STRING, allowNull: false},
-    name: {type: DataTypes.STRING,  allowNull: false},
-    sum: {type: DataTypes.INTEGER, allowNull: false},
-    categoryExpenseId: { type: DataTypes.INTEGER, allowNull: true }, 
-    categoryIncomeId: { type: DataTypes.INTEGER, allowNull: true }   
-})
 CategoryExpense.hasMany(Transaction)
 Transaction.belongsTo(CategoryExpense)
 
 CategoryIncome.hasMany(Transaction) 
 Transaction.belongsTo(CategoryIncome)
 
- 
-module.exports ={
+module.exports = {
     CategoryExpense, 
     CategoryIncome, 
     Transaction,
-
+    User,
 }
-

@@ -1,80 +1,103 @@
-const {CategoryIncome} = require('../models/models')
+const { CategoryIncome } = require('../models/models')
 
-
-class IncomeController{
-
-    async create(req, res)//Создание категории
-    {
+class IncomeController {
+    async create(req, res) {
         try {
-            const {name} = req.body
-            const category = await CategoryIncome.create({name})
-            res.json(category)
+            const { name } = req.body
+            const userId = req.user.id 
 
+            if (!name) {
+                return res.status(400).json({ message: "Название категории обязательно" })
+            }
+
+            const category = await CategoryIncome.create({ name, userId })
+            return res.status(201).json(category)
 
         } catch (error) {
-            console.error(error)   
+            console.error(error)
+            return res.status(500).json({ message: "Ошибка при создании категории" })
         }
     }
 
-    async getAll(req, res)//Получение всех категорий 
-    {
-        const categoryAll = await CategoryIncome.findAll()
-        return res.json(categoryAll)
-    }
-
-    async getOne(req, res)//Получение одной категории по ID
-    {
+    async getAll(req, res) {
         try {
-            const {id} = req.params
-            const categoryOne = await CategoryIncome.findOne({where:{id}})
-            if(!categoryOne){
-                res.status(404).json({meassage:"Категория не найдена"})
-            }
-            return res.json(categoryOne)
-            
+            const userId = req.user.id
+            const categories = await CategoryIncome.findAll({ where: { userId } })
+            return res.json(categories)
         } catch (error) {
             console.error(error)
-            return res.status(500).json({message:"Запрос не может быть обработан"})
+            return res.status(500).json({ message: "Ошибка при получении категорий" })
         }
     }
 
-    async upDate(req, res)//Обновления названия в категории
-    {
+    async getOne(req, res) {
         try {
-            const{name} = req.body
-            const {id} = req.params
-            const categoryUp = await CategoryIncome.findOne({where:{id}})
-            if(!categoryUp){
-                res.status(404).json({meassage: "Категория не найдена"})
+            const { id } = req.params
+            const userId = req.user.id
+
+            const category = await CategoryIncome.findOne({ 
+                where: { id, userId } 
+            })
+
+            if (!category) {
+                return res.status(404).json({ message: "Категория не найдена" })
             }
-            categoryUp.name = name
-            await categoryUp.save()
-            return res.json(categoryUp)
-            
+
+            return res.json(category)
         } catch (error) {
             console.error(error)
-            return res.status(500).json({message:"Запрос не может быть обработан"})
+            return res.status(500).json({ message: "Ошибка при получении категории" })
         }
     }
 
-    async deleteOne(req, res)//Удаление категории по ID
-    {
+    async update(req, res) {
         try {
-            const {id} = req.params
-            const categoryDelete = await CategoryIncome.findOne({where:{id}})
-            if(!categoryDelete){
-                res.status(404).json({meassage:"Категория не найдена"})
+            const { id } = req.params
+            const { name } = req.body
+            const userId = req.user.id
+
+            if (!name) {
+                return res.status(400).json({ message: "Название категории обязательно" })
             }
-            await categoryDelete.destroy()
-            res.json(categoryDelete)
-        }
-            
-        catch (error) {
+
+            const category = await CategoryIncome.findOne({ 
+                where: { id, userId } 
+            })
+
+            if (!category) {
+                return res.status(404).json({ message: "Категория не найдена" })
+            }
+
+            category.name = name
+            await category.save()
+
+            return res.json(category)
+        } catch (error) {
             console.error(error)
-            return res.status(500).json({message:"Запрос не может быть обработан"})
+            return res.status(500).json({ message: "Ошибка при обновлении категории" })
         }
     }
 
+    async delete(req, res) {
+        try {
+            const { id } = req.params
+            const userId = req.user.id
+
+            const category = await CategoryIncome.findOne({ 
+                where: { id, userId } 
+            })
+
+            if (!category) {
+                return res.status(404).json({ message: "Категория не найдена" })
+            }
+
+            await category.destroy()
+            return res.json({ message: "Категория успешно удалена" })
+        } catch (error) {
+            console.error(error)
+            return res.status(500).json({ message: "Ошибка при удалении категории" })
+        }
+    }
 }
 
-module.exports = new IncomeController() //экспорт класса дохода
+module.exports = new IncomeController()

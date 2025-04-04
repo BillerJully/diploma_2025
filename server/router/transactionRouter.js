@@ -6,6 +6,6 @@ router.get('/:id', transactionController.getOne)
 router.post('/', transactionController.create)
 router.get('/', transactionController.getAll)
 router.delete('/:id', transactionController.deleteOne)
-router.put('/:id', transactionController.upDateOne)
+router.put('/:id', transactionController.updateOne)
 
 module.exports = router
