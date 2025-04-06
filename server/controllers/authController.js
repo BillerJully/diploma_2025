@@ -1,16 +1,16 @@
-const { User } = require('../models/models')
+const { User, TokenModel } = require('../models/models')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const { validationResult } = require('express-validator')
 require('dotenv').config()
 
 const SECRET_KEY = process.env.SECRET_KEY 
-
+// генерация токена
 const generateAccessToken = (id) => {
     const payload = { 
         id
     }
-    return jwt.sign(payload, SECRET_KEY, { expiresIn: "1h" })
+    return jwt.sign(payload, SECRET_KEY, { expiresIn: "30d" })
 }
 
 class AuthController { 
@@ -43,10 +43,11 @@ class AuthController {
                 username, 
                 password: hashPassword 
             })
-
+           
             // Генерация токена
             const token = generateAccessToken(user.id)
-
+            const saveToken = await TokenModel.create({tokenName: token, userId: user.id})
+           
             return res.status(201).json({ // 201 для успешного создания
                 message: "Пользователь успешно зарегистрирован",
                 token,
@@ -61,7 +62,7 @@ class AuthController {
             })
         }
     }
-
+    
     async login(req, res) {
         try {
             const { username, password } = req.body
