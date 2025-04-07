@@ -3,7 +3,7 @@ const sequelize = require('../db')
 
 const CategoryExpense = sequelize.define('category_expense', {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-    name: { type: DataTypes.STRING, unique: true, allowNull: false },
+    name: { type: DataTypes.STRING,  allowNull: false },
     userId: { type: DataTypes.INTEGER, allowNull: false } 
 }) 
 

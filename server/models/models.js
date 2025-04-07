@@ -2,13 +2,13 @@ const User = require('./userModels')
 const CategoryExpense = require('./expenseModels')
 const CategoryIncome = require('./incomeModels')
 const Transaction = require('./transactionModels')
-const TokenModel = require('./tokenModels')
+const Token = require('./tokenModels')
 
 User.hasMany(CategoryExpense) // Один пользователь имеет много категорий
 CategoryExpense.belongsTo(User) // Одна категория имеет одного пользователя
 
-User.hasOne(TokenModel)
-TokenModel.belongsTo(User)
+User.hasOne(Token)
+Token.belongsTo(User)
 
 User.hasMany(CategoryIncome)
 CategoryIncome.belongsTo(User)
@@ -27,5 +27,5 @@ module.exports = {
     CategoryIncome, 
     Transaction,
     User,
-    TokenModel
+    Token
 }

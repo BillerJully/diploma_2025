@@ -33,7 +33,9 @@ class ExpenseController {
             return res.json({categories})
         } catch (error) {
             console.error('Ошибка при получении категорий:', error)
-            return res.status(500).json({ message: "Ошибка при получении категорий" })
+            return res.status(500).json({
+                 message: "Ошибка при получении категорий",
+                error: error.message })
         }
     }
 

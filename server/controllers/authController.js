@@ -1,4 +1,4 @@
-const { User, TokenModel } = require('../models/models')
+const { User, Token} = require('../models/models')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const { validationResult } = require('express-validator')
@@ -46,7 +46,7 @@ class AuthController {
            
             // Генерация токена
             const token = generateAccessToken(user.id)
-            const saveToken = await TokenModel.create({tokenName: token, userId: user.id})
+            const saveToken = await Token.create({tokenName: token, userId: user.id})
            
             return res.status(201).json({ // 201 для успешного создания
                 message: "Пользователь успешно зарегистрирован",
