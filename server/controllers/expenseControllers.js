@@ -28,21 +28,14 @@ class ExpenseController {
     async getAll(req, res) {
         try {
             const userId = req.user.id
-            const categories = await CategoryExpense.findAll({ 
-                where: { userId },
-                attributes: ['id', 'name'] 
-            })
+            const categories = await CategoryExpense.findAll({ where: { userId } })
             
-            return res.json({
-                count: categories.length,
-                categories
-            })
+            return res.json({categories})
         } catch (error) {
             console.error('Ошибка при получении категорий:', error)
-            return res.status(500).json({ 
-                message: "Ошибка при получении категорий расходов",
-                error: error.message
-            })
+            return res.status(500).json({
+                 message: "Ошибка при получении категорий",
+                error: error.message })
         }
     }
 
@@ -53,7 +46,7 @@ class ExpenseController {
 
             const category = await CategoryExpense.findOne({ 
                 where: { id, userId },
-                attributes: ['id', 'name']
+               
             })
 
             if (!category) {

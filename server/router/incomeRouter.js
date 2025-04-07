@@ -2,6 +2,7 @@ const express = require('express')
 const router = express.Router()
 const incomeController = require('../controllers/incomeController')
 
+
 router.get('/', incomeController.getAll)
 router.get('/:id', incomeController.getOne)
 router.post('/', incomeController.create)

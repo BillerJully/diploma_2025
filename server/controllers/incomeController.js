@@ -11,11 +11,17 @@ class IncomeController {
             }
 
             const category = await CategoryIncome.create({ name, userId })
-            return res.status(201).json(category)
+            return res.status(201).json({
+                message: "Категория расходов создана",
+                category
+            })
 
         } catch (error) {
-            console.error(error)
-            return res.status(500).json({ message: "Ошибка при создании категории" })
+            console.error('Ошибка при создании категории:', error)
+            return res.status(500).json({ 
+                message: "Ошибка при создании категории расходов",
+                error: error.message 
+            })
         }
     }
 
