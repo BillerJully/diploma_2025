@@ -46,8 +46,14 @@ class AuthController {
            
             // Генерация токена
             const token = generateAccessToken(user.id)
-            const saveToken = await Token.create({tokenName: token, userId: user.id})
            
+            const lifeTime = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 дней
+
+            await Token.create({
+                tokenName: token,
+                userId: user.id,
+                lifeTime: lifeTime  
+            })
             return res.status(201).json({ // 201 для успешного создания
                 message: "Пользователь успешно зарегистрирован",
                 token,
@@ -85,6 +91,13 @@ class AuthController {
 
             // Генерация токена
             const token = generateAccessToken(user.id)
+            const lifeTime = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+
+            await Token.create({
+                tokenName: token,
+                userId: user.id,
+                lifeTime: lifeTime
+            })
 
             return res.json({
                 message: "Успешная авторизация",
@@ -99,6 +112,19 @@ class AuthController {
                 message: "Внутренняя ошибка сервера",
                 error: error.message 
             })
+        }
+    }
+    async logout(req, res) {
+        try {
+            const token = req.headers.authorization?.split(' ')[1]
+            if (!token) {
+                return res.status(400).json({message: "Токен не предоставлен"})
+            }
+    
+            await Token.destroy({ where: { tokenName: token } })
+            return res.json({message: "Выход выполнен успешно"})
+        } catch (e) {
+            return res.status(500).json({message: "Ошибка при выходе"})
         }
     }
 

@@ -6,9 +6,10 @@ const Transaction = sequelize.define('transaction', {
     date_transaction: {type: DataTypes.STRING, allowNull: false},
     name: {type: DataTypes.STRING, allowNull: false},
     sum: {type: DataTypes.INTEGER, allowNull: false},
-    categoryExpenseId: { type: DataTypes.INTEGER, allowNull: true }, 
-    categoryIncomeId: { type: DataTypes.INTEGER, allowNull: true },
-    userId: { type: DataTypes.INTEGER, allowNull: false }   
+    categoryId: { type: DataTypes.INTEGER, allowNull: true }, 
+    userId: { type: DataTypes.INTEGER, allowNull: false },
+    isTypeIncome: { type: DataTypes.BOOLEAN, allowNull: false}
+
 })
 
 module.exports = Transaction

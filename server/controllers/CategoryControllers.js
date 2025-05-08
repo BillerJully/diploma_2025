@@ -1,16 +1,16 @@
-const { CategoryExpense } = require('../models/models')
+const { Category } = require('../models/models')
 
-class ExpenseController {
+class CategoryController {
     async create(req, res) {
         try {
-            const { name } = req.body
+            const { name, isTypeIncome, limit } = req.body
             const userId = req.user.id 
 
             if (!name) {
                 return res.status(400).json({ message: "Название категории обязательно" })
             }
 
-            const category = await CategoryExpense.create({ name, userId })
+            const category = await Category.create({ name, userId,isTypeIncome, limit })
             return res.status(201).json({
                 message: "Категория расходов создана",
                 category
@@ -19,7 +19,7 @@ class ExpenseController {
         } catch (error) {
             console.error('Ошибка при создании категории:', error)
             return res.status(500).json({ 
-                message: "Ошибка при создании категории расходов",
+                message: "Ошибка при создании категории",
                 error: error.message 
             })
         }
@@ -28,7 +28,22 @@ class ExpenseController {
     async getAll(req, res) {
         try {
             const userId = req.user.id
-            const categories = await CategoryExpense.findAll({ where: { userId } })
+            const categories = await Category.findAll({ where: { userId } })
+            
+            return res.json({categories})
+        } catch (error) {
+            console.error('Ошибка при получении категорий:', error)
+            return res.status(500).json({
+                 message: "Ошибка при получении категорий",
+                error: error.message })
+        }
+    }
+
+    async getAllByType(req, res) {
+        try {
+            const { isTypeIncome } = req.params
+            const userId = req.user.id
+            const categories = await Category.findAll({ where: { userId,isTypeIncome } })
             
             return res.json({categories})
         } catch (error) {
@@ -44,7 +59,7 @@ class ExpenseController {
             const { id } = req.params
             const userId = req.user.id
 
-            const category = await CategoryExpense.findOne({ 
+            const category = await Category.findOne({ 
                 where: { id, userId },
                
             })
@@ -75,7 +90,7 @@ class ExpenseController {
                 return res.status(400).json({ message: "Название категории обязательно" })
             }
 
-            const category = await CategoryExpense.findOne({ 
+            const category = await Category.findOne({ 
                 where: { id, userId }
             })
 
@@ -106,7 +121,7 @@ class ExpenseController {
             const { id } = req.params
             const userId = req.user.id
 
-            const category = await CategoryExpense.findOne({ 
+            const category = await Category.findOne({ 
                 where: { id, userId }
             })
 
@@ -129,6 +144,8 @@ class ExpenseController {
             })
         }
     }
+
+    
 }
 
-module.exports = new ExpenseController()
+module.exports = new CategoryController()

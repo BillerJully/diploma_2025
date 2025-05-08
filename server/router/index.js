@@ -1,13 +1,15 @@
 const express = require('express')
 const router = express.Router()
 const authRouter = require('./authRouter')
-const expenseRouter = require('./expenseRouter')
-const incomeRouter = require('./incomeRouter')
+const categoryRouter = require('./categoryRouter')
 const transactionRouter = require('./transactionRouter')
 const authMiddleware = require('../middleware/authMiddleware')
-router.use('/expense',authMiddleware, expenseRouter)
-router.use('/income',authMiddleware, incomeRouter)
+const budgetRouter = require('./budgetRouter')
+const goalsRoutes = require('./financialGoalRouter');
+
+router.use('/api', goalsRoutes);
+router.use('/category',authMiddleware, categoryRouter)
 router.use('/transaction', authMiddleware, transactionRouter )
 router.use('/auth', authRouter)
-
+router.use('/budget', budgetRouter)
 module.exports = router
